@@ -20,4 +20,8 @@
         <module>vaadin</module>
     </modules>
 
+    <properties>
+        <java.version>19</java.version>
+    </properties>
+
 </project>

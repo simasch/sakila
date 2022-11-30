@@ -1,30 +1,27 @@
-package ch.martinelli.sakila.ui.views.masterdetail;
+package ch.martinelli.sakila.ui.views.customers;
 
-import ch.martinelli.sakila.db.tables.records.CustomerListRecord;
 import ch.martinelli.sakila.db.tables.records.CustomerRecord;
 import ch.martinelli.sakila.ui.views.MainLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import org.jooq.DSLContext;
+import org.jooq.Record4;
 
 import java.util.Optional;
 
@@ -32,30 +29,21 @@ import static ch.martinelli.sakila.db.tables.Customer.CUSTOMER;
 import static ch.martinelli.sakila.db.tables.CustomerList.CUSTOMER_LIST;
 import static io.seventytwo.vaadinjooq.util.VaadinJooqUtil.orderFields;
 
-@PageTitle("Master-Detail")
-@Route(value = "master-detail/:id?/:action?(edit)", layout = MainLayout.class)
 @PermitAll
-@Uses(Icon.class)
-public class MasterDetailView extends Div implements BeforeEnterObserver {
+@PageTitle("Customers")
+@Route(value = "customers/:id?/:action?(edit)", layout = MainLayout.class)
+public class CustomersView extends Div implements BeforeEnterObserver {
 
-    private final String ID = "id";
-    private final String EDIT_ROUTE_TEMPLATE = "master-detail/%s/edit";
-
-    private final Grid<CustomerListRecord> grid = new Grid<>();
+    private final Grid<Record4<Integer, String, String, String>> grid = new Grid<>();
     private final DSLContext dsl;
 
     private final BeanValidationBinder<CustomerRecord> binder = new BeanValidationBinder<>(CustomerRecord.class);
-    private Button save;
-    private Button cancel;
 
-    private CustomerRecord customer;
-
-    public MasterDetailView(DSLContext dsl) {
+    public CustomersView(DSLContext dsl) {
         this.dsl = dsl;
 
-        addClassNames("master-detail-view");
+        addClassNames("customers-view");
 
-        // Create UI
         SplitLayout splitLayout = new SplitLayout();
 
         createGridLayout(splitLayout);
@@ -63,32 +51,41 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
 
         add(splitLayout);
 
-        // Configure Grid
-        grid.addColumn(CustomerListRecord::getName).setAutoWidth(true);
-        grid.addColumn(CustomerListRecord::getAddress).setAutoWidth(true);
-        grid.addColumn(CustomerListRecord::getCity).setAutoWidth(true);
+        grid.addColumn(r -> r.get(CUSTOMER_LIST.NAME)).setHeader("Name").setSortProperty(CUSTOMER_LIST.NAME.getName()).setAutoWidth(true);
+        grid.addColumn(r -> r.get(CUSTOMER_LIST.ADDRESS)).setHeader("Address").setSortProperty(CUSTOMER_LIST.ADDRESS.getName()).setAutoWidth(true);
+        grid.addColumn(r -> r.get(CUSTOMER_LIST.CITY)).setHeader("City").setSortProperty(CUSTOMER_LIST.CITY.getName()).setAutoWidth(true);
 
-        grid.setItems(query -> dsl.selectFrom(CUSTOMER_LIST).orderBy(orderFields(CUSTOMER_LIST, query)).offset(query.getOffset()).stream().limit(query.getLimit()));
+        grid.setItems(query -> dsl
+                .select(CUSTOMER_LIST.ID, CUSTOMER_LIST.NAME, CUSTOMER_LIST.ADDRESS, CUSTOMER_LIST.CITY)
+                .from(CUSTOMER_LIST)
+                .orderBy(orderFields(CUSTOMER_LIST, query))
+                .offset(query.getOffset())
+                .limit(query.getLimit())
+                .fetchStream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+
+        grid.setMultiSort(true);
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format(EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
+                UI.getCurrent().navigate(String.format("customers/%s/edit", event.getValue().get(CUSTOMER_LIST.ID)));
             } else {
-                clearForm();
-                UI.getCurrent().navigate(MasterDetailView.class);
+                binder.setBean(dsl.newRecord(CUSTOMER));
+
+                UI.getCurrent().navigate(CustomersView.class);
             }
         });
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
+        String ID = "id";
         Optional<Integer> customerId = event.getRouteParameters().get(ID).map(Integer::valueOf);
         if (customerId.isPresent()) {
-            CustomerRecord customerFromDb = dsl.selectFrom(CUSTOMER).where(CUSTOMER.CUSTOMER_ID.eq(customerId.get())).fetchOne();
-            if (customerFromDb != null) {
-                populateForm(customerFromDb);
+            CustomerRecord customer = dsl.selectFrom(CUSTOMER).where(CUSTOMER.CUSTOMER_ID.eq(customerId.get())).fetchOne();
+            if (customer != null) {
+                binder.setBean(customer);
             } else {
                 Notification.show(
                         String.format("The requested samplePerson was not found, ID = %s", customerId.get()), 3000,
@@ -96,7 +93,7 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
                 // when a row is selected but the data is no longer available,
                 // refresh grid
                 refreshGrid();
-                event.forwardTo(MasterDetailView.class);
+                event.forwardTo(CustomersView.class);
             }
         }
     }
@@ -128,36 +125,35 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
     }
 
     private void createButtonLayout(Div editorLayoutDiv) {
-        cancel = new Button("Cancel", e -> {
-            clearForm();
-            refreshGrid();
-        });
+        Button save = new Button("Save", e -> {
+            if (binder.validate().isOk()) {
+                dsl.transaction(t -> {
+                    CustomerRecord customer = binder.getBean();
+                    t.dsl().attach(customer);
+                    customer.store();
+                });
 
-        save = new Button("Save", e -> {
-            try {
-                if (this.customer == null) {
-                    this.customer = CUSTOMER.newRecord();
-                }
-
-                binder.writeBean(this.customer);
-                this.customer.store();
-
-                clearForm();
+                binder.setBean(dsl.newRecord(CUSTOMER));
                 refreshGrid();
 
-                Notification.show("SamplePerson details stored.");
+                Notification.show("Customer details stored.");
 
-                UI.getCurrent().navigate(MasterDetailView.class);
-            } catch (ValidationException validationException) {
-                Notification.show("An exception happened while trying to store the samplePerson details.");
+                UI.getCurrent().navigate(CustomersView.class);
             }
+        });
+
+        Button cancel = new Button("Cancel", e -> {
+            binder.setBean(dsl.newRecord(CUSTOMER));
+            refreshGrid();
         });
 
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setClassName("button-layout");
         cancel.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
         buttonLayout.add(save, cancel);
+
         editorLayoutDiv.add(buttonLayout);
     }
 
@@ -173,12 +169,4 @@ public class MasterDetailView extends Div implements BeforeEnterObserver {
         grid.getDataProvider().refreshAll();
     }
 
-    private void clearForm() {
-        populateForm(null);
-    }
-
-    private void populateForm(CustomerRecord value) {
-        customer = value;
-        binder.readBean(this.customer);
-    }
 }

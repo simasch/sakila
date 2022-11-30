@@ -4,8 +4,8 @@ import ch.martinelli.sakila.backend.entity.ApplicationUserDTO;
 import ch.martinelli.sakila.security.UserContext;
 import ch.martinelli.sakila.ui.components.appnav.AppNav;
 import ch.martinelli.sakila.ui.components.appnav.AppNavItem;
+import ch.martinelli.sakila.ui.views.customers.CustomersView;
 import ch.martinelli.sakila.ui.views.imagelist.ImageListView;
-import ch.martinelli.sakila.ui.views.masterdetail.MasterDetailView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -75,8 +75,8 @@ public class MainLayout extends AppLayout {
             nav.addItem(new AppNavItem("Image List", ImageListView.class, "la la-th-list"));
 
         }
-        if (accessChecker.hasAccess(MasterDetailView.class)) {
-            nav.addItem(new AppNavItem("Master-Detail", MasterDetailView.class, "la la-columns"));
+        if (accessChecker.hasAccess(CustomersView.class)) {
+            nav.addItem(new AppNavItem("Master-Detail", CustomersView.class, "la la-columns"));
         }
 
         return nav;

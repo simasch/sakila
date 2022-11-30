@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14.5
+    container_name: sakila
+    restart: always
+    environment:
+      - POSTGRES_USER=sakila
+      - POSTGRES_PASSWORD=sakila
+    ports:
+      - '5434:5432'

@@ -1,13 +1,13 @@
-.image-list-view ol {
-    grid-template-columns: repeat(auto-fill, minmax(256px, 1fr));
+div.films-view {
+    height: calc(100% - 100px);
 }
 
-.image-list-view li {
+div.film-card {
     transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
     transition-property: background-color, box-shadow;
 }
 
-.image-list-view li:hover {
+div.film-card:hover {
     background-color: var(--lumo-base-color);
     box-shadow: var(--lumo-box-shadow-s);
 }

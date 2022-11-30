@@ -5,7 +5,7 @@ import ch.martinelli.sakila.security.UserContext;
 import ch.martinelli.sakila.ui.components.appnav.AppNav;
 import ch.martinelli.sakila.ui.components.appnav.AppNavItem;
 import ch.martinelli.sakila.ui.views.customers.CustomersView;
-import ch.martinelli.sakila.ui.views.imagelist.ImageListView;
+import ch.martinelli.sakila.ui.views.films.FilmsView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -71,8 +71,8 @@ public class MainLayout extends AppLayout {
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         AppNav nav = new AppNav();
 
-        if (accessChecker.hasAccess(ImageListView.class)) {
-            nav.addItem(new AppNavItem("Image List", ImageListView.class, "la la-th-list"));
+        if (accessChecker.hasAccess(FilmsView.class)) {
+            nav.addItem(new AppNavItem("Movies", FilmsView.class, "la la-th-list"));
 
         }
         if (accessChecker.hasAccess(CustomersView.class)) {

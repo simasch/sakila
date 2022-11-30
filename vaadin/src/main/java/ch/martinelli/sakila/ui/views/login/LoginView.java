@@ -1,6 +1,6 @@
 package ch.martinelli.sakila.ui.views.login;
 
-import ch.martinelli.sakila.backend.service.UserContext;
+import ch.martinelli.sakila.security.UserContext;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.LoginOverlay;
 import com.vaadin.flow.router.BeforeEnterEvent;

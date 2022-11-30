@@ -1,8 +1,7 @@
-package ch.martinelli.sakila.backend.service;
+package ch.martinelli.sakila.security;
 
-import ch.martinelli.sakila.backend.entity.ApplicationUser;
+import ch.martinelli.sakila.backend.entity.ApplicationUserDTO;
 import ch.martinelli.sakila.backend.repository.UserRepository;
-import ch.martinelli.sakila.configuration.security.SecurityConfiguration;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,7 @@ public class UserContext {
     }
 
     @Transactional
-    public Optional<ApplicationUser> get() {
+    public Optional<ApplicationUserDTO> get() {
         return getAuthentication().map(authentication -> userRepository.findByUsername(authentication.getName()));
     }
 

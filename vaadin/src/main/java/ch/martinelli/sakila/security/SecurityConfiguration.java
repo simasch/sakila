@@ -1,4 +1,4 @@
-package ch.martinelli.sakila.configuration.security;
+package ch.martinelli.sakila.security;
 
 import ch.martinelli.sakila.ui.views.login.LoginView;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;

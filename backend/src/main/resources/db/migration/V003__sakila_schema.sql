@@ -1,12 +1,3 @@
-CREATE
-OR REPLACE PROCEDURAL LANGUAGE plpgsql;
-
-ALTER
-PROCEDURAL LANGUAGE plpgsql OWNER TO sakila;
-
-SET
-search_path = public, pg_catalog;
-
 CREATE SEQUENCE actor_actor_id_seq
     INCREMENT BY 1
     NO MAXVALUE

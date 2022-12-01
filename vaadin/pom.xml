@@ -58,6 +58,11 @@
         </dependency>
 
         <dependency>
+            <groupId>in.virit</groupId>
+            <artifactId>viritin</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
             <groupId>io.seventytwo.oss</groupId>
             <artifactId>vaadin-jooq</artifactId>
             <version>1.2.0</version>

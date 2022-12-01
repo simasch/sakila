@@ -36,6 +36,7 @@ import static ch.martinelli.sakila.db.tables.FilmList.FILM_LIST;
 @AnonymousAllowed
 public class FilmsView extends Div {
 
+    private static final int PAGE_SIZE = 24;
     private final DSLContext dsl;
     private final OrderedList imageContainer = new OrderedList();
     private int offset = 0;
@@ -54,10 +55,10 @@ public class FilmsView extends Div {
         VerticalLayout headerContainer = new VerticalLayout();
 
         H2 header = new H2("Popular");
-        header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
+        header.addClassNames(Margin.Bottom.NONE, Margin.Top.NONE, FontSize.XXXLARGE);
 
         Paragraph description = new Paragraph("Most popular movies");
-        description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
+        description.addClassNames(Margin.Bottom.NONE, Margin.Top.NONE, TextColor.SECONDARY);
 
         headerContainer.add(header, description);
 
@@ -78,7 +79,7 @@ public class FilmsView extends Div {
         vScroller.setHeightFull();
 
         vScroller.addScrollToEndListener(e -> {
-            offset += 30;
+            offset += PAGE_SIZE;
             loadFilms(offset);
         });
 
@@ -86,7 +87,7 @@ public class FilmsView extends Div {
     }
 
     private void loadFilms(int offset) {
-        Result<FilmListRecord> films = dsl.selectFrom(FILM_LIST).offset(offset).limit(30).fetch();
+        Result<FilmListRecord> films = dsl.selectFrom(FILM_LIST).offset(offset).limit(PAGE_SIZE).fetch();
 
         for (FilmListRecord film : films) {
             imageContainer.add(new FilmCard(film, "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));

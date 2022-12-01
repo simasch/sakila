@@ -1,5 +1,6 @@
 package ch.martinelli.sakila.ui.views.customers;
 
+import ch.martinelli.sakila.backend.repository.CustomerRepository;
 import ch.martinelli.sakila.db.tables.records.CustomerRecord;
 import ch.martinelli.sakila.ui.views.MainLayout;
 import com.vaadin.flow.component.UI;
@@ -20,12 +21,10 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
-import org.jooq.DSLContext;
 import org.jooq.Record4;
 
 import java.util.Optional;
 
-import static ch.martinelli.sakila.db.tables.Customer.CUSTOMER;
 import static ch.martinelli.sakila.db.tables.CustomerList.CUSTOMER_LIST;
 import static io.seventytwo.vaadinjooq.util.VaadinJooqUtil.orderFields;
 
@@ -35,12 +34,12 @@ import static io.seventytwo.vaadinjooq.util.VaadinJooqUtil.orderFields;
 public class CustomersView extends Div implements BeforeEnterObserver {
 
     private final Grid<Record4<Integer, String, String, String>> grid = new Grid<>();
-    private final DSLContext dsl;
+    private final CustomerRepository customerRepository;
 
     private final BeanValidationBinder<CustomerRecord> binder = new BeanValidationBinder<>(CustomerRecord.class);
 
-    public CustomersView(DSLContext dsl) {
-        this.dsl = dsl;
+    public CustomersView(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
 
         addClassNames("customers-view");
 
@@ -51,27 +50,21 @@ public class CustomersView extends Div implements BeforeEnterObserver {
 
         add(splitLayout);
 
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.setMultiSort(true);
+
         grid.addColumn(r -> r.get(CUSTOMER_LIST.NAME)).setHeader("Name").setSortProperty(CUSTOMER_LIST.NAME.getName()).setAutoWidth(true);
         grid.addColumn(r -> r.get(CUSTOMER_LIST.ADDRESS)).setHeader("Address").setSortProperty(CUSTOMER_LIST.ADDRESS.getName()).setAutoWidth(true);
         grid.addColumn(r -> r.get(CUSTOMER_LIST.CITY)).setHeader("City").setSortProperty(CUSTOMER_LIST.CITY.getName()).setAutoWidth(true);
 
-        grid.setItems(query -> dsl
-                .select(CUSTOMER_LIST.ID, CUSTOMER_LIST.NAME, CUSTOMER_LIST.ADDRESS, CUSTOMER_LIST.CITY)
-                .from(CUSTOMER_LIST)
-                .orderBy(orderFields(CUSTOMER_LIST, query))
-                .offset(query.getOffset())
-                .limit(query.getLimit())
-                .fetchStream());
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-
-        grid.setMultiSort(true);
+        grid.setItems(query -> customerRepository.findAll(orderFields(CUSTOMER_LIST, query), query.getOffset(), query.getLimit()));
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {
                 UI.getCurrent().navigate(String.format("customers/%s/edit", event.getValue().get(CUSTOMER_LIST.ID)));
             } else {
-                binder.setBean(dsl.newRecord(CUSTOMER));
+                binder.setBean(customerRepository.newRecord());
 
                 UI.getCurrent().navigate(CustomersView.class);
             }
@@ -83,15 +76,12 @@ public class CustomersView extends Div implements BeforeEnterObserver {
         String ID = "id";
         Optional<Integer> customerId = event.getRouteParameters().get(ID).map(Integer::valueOf);
         if (customerId.isPresent()) {
-            CustomerRecord customer = dsl.selectFrom(CUSTOMER).where(CUSTOMER.CUSTOMER_ID.eq(customerId.get())).fetchOne();
-            if (customer != null) {
-                binder.setBean(customer);
+            Optional<CustomerRecord> customer = customerRepository.findById(customerId.get());
+            if (customer.isPresent()) {
+                binder.setBean(customer.get());
             } else {
-                Notification.show(
-                        String.format("The requested samplePerson was not found, ID = %s", customerId.get()), 3000,
-                        Notification.Position.BOTTOM_START);
-                // when a row is selected but the data is no longer available,
-                // refresh grid
+                Notification.show(String.format("The requested customer was not found, ID = %s", customerId.get()));
+
                 refreshGrid();
                 event.forwardTo(CustomersView.class);
             }
@@ -127,13 +117,10 @@ public class CustomersView extends Div implements BeforeEnterObserver {
     private void createButtonLayout(Div editorLayoutDiv) {
         Button save = new Button("Save", e -> {
             if (binder.validate().isOk()) {
-                dsl.transaction(t -> {
-                    CustomerRecord customer = binder.getBean();
-                    t.dsl().attach(customer);
-                    customer.store();
-                });
+                CustomerRecord customer = binder.getBean();
+                customerRepository.save(customer);
 
-                binder.setBean(dsl.newRecord(CUSTOMER));
+                binder.setBean(customerRepository.newRecord());
                 refreshGrid();
 
                 Notification.show("Customer details stored.");
@@ -143,7 +130,7 @@ public class CustomersView extends Div implements BeforeEnterObserver {
         });
 
         Button cancel = new Button("Cancel", e -> {
-            binder.setBean(dsl.newRecord(CUSTOMER));
+            binder.setBean(customerRepository.newRecord());
             refreshGrid();
         });
 

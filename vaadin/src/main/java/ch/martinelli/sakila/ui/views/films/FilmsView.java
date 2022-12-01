@@ -1,5 +1,6 @@
 package ch.martinelli.sakila.ui.views.films;
 
+import ch.martinelli.sakila.backend.repository.FilmRepository;
 import ch.martinelli.sakila.db.tables.records.FilmListRecord;
 import ch.martinelli.sakila.ui.views.MainLayout;
 import com.vaadin.flow.component.html.Div;
@@ -24,11 +25,9 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.MaxWidth;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-import org.jooq.DSLContext;
-import org.jooq.Result;
 import org.vaadin.firitin.components.orderedlayout.VScroller;
 
-import static ch.martinelli.sakila.db.tables.FilmList.FILM_LIST;
+import java.util.List;
 
 @PageTitle("Film List")
 @Route(value = "films", layout = MainLayout.class)
@@ -37,12 +36,12 @@ import static ch.martinelli.sakila.db.tables.FilmList.FILM_LIST;
 public class FilmsView extends Div {
 
     private static final int PAGE_SIZE = 24;
-    private final DSLContext dsl;
+    private final FilmRepository filmRepository;
     private final OrderedList imageContainer = new OrderedList();
     private int offset = 0;
 
-    public FilmsView(DSLContext dsl) {
-        this.dsl = dsl;
+    public FilmsView(FilmRepository filmRepository) {
+        this.filmRepository = filmRepository;
 
         addClassNames("films-view");
 
@@ -87,7 +86,7 @@ public class FilmsView extends Div {
     }
 
     private void loadFilms(int offset) {
-        Result<FilmListRecord> films = dsl.selectFrom(FILM_LIST).offset(offset).limit(PAGE_SIZE).fetch();
+        List<FilmListRecord> films = filmRepository.findAll(offset, PAGE_SIZE);
 
         for (FilmListRecord film : films) {
             imageContainer.add(new FilmCard(film, "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));

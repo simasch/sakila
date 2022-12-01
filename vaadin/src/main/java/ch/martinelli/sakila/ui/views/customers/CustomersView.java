@@ -1,5 +1,6 @@
 package ch.martinelli.sakila.ui.views.customers;
 
+import ch.martinelli.sakila.backend.entity.CustomerListEntry;
 import ch.martinelli.sakila.backend.repository.CustomerRepository;
 import ch.martinelli.sakila.db.tables.records.CustomerRecord;
 import ch.martinelli.sakila.ui.views.MainLayout;
@@ -21,7 +22,6 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
-import org.jooq.Record4;
 
 import java.util.Optional;
 
@@ -33,7 +33,7 @@ import static io.seventytwo.vaadinjooq.util.VaadinJooqUtil.orderFields;
 @Route(value = "customers/:id?/:action?(edit)", layout = MainLayout.class)
 public class CustomersView extends Div implements BeforeEnterObserver {
 
-    private final Grid<Record4<Integer, String, String, String>> grid = new Grid<>();
+    private final Grid<CustomerListEntry> grid = new Grid<>();
     private final CustomerRepository customerRepository;
 
     private final BeanValidationBinder<CustomerRecord> binder = new BeanValidationBinder<>(CustomerRecord.class);
@@ -53,16 +53,16 @@ public class CustomersView extends Div implements BeforeEnterObserver {
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setMultiSort(true);
 
-        grid.addColumn(r -> r.get(CUSTOMER_LIST.NAME)).setHeader("Name").setSortProperty(CUSTOMER_LIST.NAME.getName()).setAutoWidth(true);
-        grid.addColumn(r -> r.get(CUSTOMER_LIST.ADDRESS)).setHeader("Address").setSortProperty(CUSTOMER_LIST.ADDRESS.getName()).setAutoWidth(true);
-        grid.addColumn(r -> r.get(CUSTOMER_LIST.CITY)).setHeader("City").setSortProperty(CUSTOMER_LIST.CITY.getName()).setAutoWidth(true);
+        grid.addColumn(CustomerListEntry::name).setHeader("Name").setSortProperty(CUSTOMER_LIST.NAME.getName()).setAutoWidth(true);
+        grid.addColumn(CustomerListEntry::address).setHeader("Address").setSortProperty(CUSTOMER_LIST.ADDRESS.getName()).setAutoWidth(true);
+        grid.addColumn(CustomerListEntry::city).setHeader("City").setSortProperty(CUSTOMER_LIST.CITY.getName()).setAutoWidth(true);
 
-        grid.setItems(query -> customerRepository.findAll(orderFields(CUSTOMER_LIST, query), query.getOffset(), query.getLimit()));
+        grid.setItems(query -> customerRepository.findAll(orderFields(CUSTOMER_LIST, query), query.getOffset(), query.getLimit()).stream());
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format("customers/%s/edit", event.getValue().get(CUSTOMER_LIST.ID)));
+                UI.getCurrent().navigate(String.format("customers/%s/edit", event.getValue().id()));
             } else {
                 binder.setBean(customerRepository.newRecord());
 

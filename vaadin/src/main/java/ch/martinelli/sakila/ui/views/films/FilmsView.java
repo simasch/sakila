@@ -1,7 +1,7 @@
 package ch.martinelli.sakila.ui.views.films;
 
+import ch.martinelli.sakila.backend.entity.FilmListEntry;
 import ch.martinelli.sakila.backend.repository.FilmRepository;
-import ch.martinelli.sakila.db.tables.records.FilmListRecord;
 import ch.martinelli.sakila.ui.views.MainLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
@@ -86,9 +86,9 @@ public class FilmsView extends Div {
     }
 
     private void loadFilms(int offset) {
-        List<FilmListRecord> films = filmRepository.findAll(offset, PAGE_SIZE);
+        List<FilmListEntry> films = filmRepository.findAll(offset, PAGE_SIZE);
 
-        for (FilmListRecord film : films) {
+        for (FilmListEntry film : films) {
             imageContainer.add(new FilmCard(film, "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
         }
     }

@@ -1,6 +1,6 @@
 package ch.martinelli.sakila.ui.views;
 
-import ch.martinelli.sakila.backend.entity.ApplicationUserDTO;
+import ch.martinelli.sakila.backend.entity.SakilaUser;
 import ch.martinelli.sakila.security.UserContext;
 import ch.martinelli.sakila.ui.components.appnav.AppNav;
 import ch.martinelli.sakila.ui.components.appnav.AppNavItem;
@@ -85,13 +85,13 @@ public class MainLayout extends AppLayout {
     private Footer createFooter() {
         Footer layout = new Footer();
 
-        Optional<ApplicationUserDTO> optionalUser = userContext.get();
+        Optional<SakilaUser> optionalUser = userContext.get();
         if (optionalUser.isPresent()) {
-            ApplicationUserDTO applicationUser = optionalUser.get();
+            SakilaUser user = optionalUser.get();
 
-            Avatar avatar = new Avatar(applicationUser.name());
+            Avatar avatar = new Avatar(user.getName());
             StreamResource resource = new StreamResource("profile-pic",
-                    () -> new ByteArrayInputStream(applicationUser.profilePicture()));
+                    () -> new ByteArrayInputStream(user.getProfilePicture()));
             avatar.setImageResource(resource);
             avatar.setThemeName("xsmall");
             avatar.getElement().setAttribute("tabindex", "-1");
@@ -102,7 +102,7 @@ public class MainLayout extends AppLayout {
             MenuItem userName = userMenu.addItem("");
             Div div = new Div();
             div.add(avatar);
-            div.add(applicationUser.name());
+            div.add(user.getName());
             div.add(new Icon("lumo", "dropdown"));
             div.getElement().getStyle().set("display", "flex");
             div.getElement().getStyle().set("align-items", "center");

@@ -1,15 +1,14 @@
 package ch.martinelli.sakila.backend.repository;
 
+import ch.martinelli.sakila.backend.entity.CustomerListEntry;
 import ch.martinelli.sakila.db.tables.records.CustomerRecord;
 import org.jooq.DSLContext;
 import org.jooq.OrderField;
-import org.jooq.Record4;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static ch.martinelli.sakila.db.tables.Customer.CUSTOMER;
 import static ch.martinelli.sakila.db.tables.CustomerList.CUSTOMER_LIST;
@@ -24,14 +23,14 @@ public class CustomerRepository {
         this.dsl = dsl;
     }
 
-    public Stream<Record4<Integer, String, String, String>> findAll(List<OrderField<?>> orderFields, int offset, int limit) {
+    public List<CustomerListEntry> findAll(List<OrderField<?>> orderFields, int offset, int limit) {
         return dsl
                 .select(CUSTOMER_LIST.ID, CUSTOMER_LIST.NAME, CUSTOMER_LIST.ADDRESS, CUSTOMER_LIST.CITY)
                 .from(CUSTOMER_LIST)
                 .orderBy(orderFields)
                 .offset(offset)
                 .limit(limit)
-                .fetchStream();
+                .fetchInto(CustomerListEntry.class);
     }
 
     public CustomerRecord newRecord() {
@@ -43,8 +42,13 @@ public class CustomerRepository {
     }
 
     @Transactional
-    public void save(CustomerRecord customer) {
+    public CustomerRecord save(CustomerRecord customer) {
         dsl.attach(customer);
         customer.store();
+        return customer;
+    }
+
+    public int count() {
+        return dsl.fetchCount(CUSTOMER_LIST);
     }
 }

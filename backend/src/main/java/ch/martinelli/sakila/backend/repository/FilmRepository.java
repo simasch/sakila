@@ -1,6 +1,6 @@
 package ch.martinelli.sakila.backend.repository;
 
-import ch.martinelli.sakila.db.tables.records.FilmListRecord;
+import ch.martinelli.sakila.backend.entity.FilmListEntry;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +17,10 @@ public class FilmRepository {
         this.dsl = dsl;
     }
 
-    public List<FilmListRecord> findAll(int offset, int limit) {
-        return dsl.selectFrom(FILM_LIST).offset(offset).limit(limit).fetch();
+    public List<FilmListEntry> findAll(int offset, int limit) {
+        return dsl
+                .select(FILM_LIST.TITLE, FILM_LIST.ACTORS, FILM_LIST.DESCRIPTION, FILM_LIST.CATEGORY)
+                .from(FILM_LIST).offset(offset).limit(limit)
+                .fetchInto(FilmListEntry.class);
     }
 }

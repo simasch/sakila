@@ -1,6 +1,7 @@
 package ch.martinelli.sakila.backend.repository;
 
-import ch.martinelli.sakila.backend.entity.ApplicationUserDTO;
+import ch.martinelli.sakila.backend.entity.Role;
+import ch.martinelli.sakila.backend.entity.SakilaUser;
 import ch.martinelli.sakila.db.tables.records.UserRolesRecord;
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -20,12 +21,17 @@ public class UserRepository {
         this.dsl = dsl;
     }
 
-    public ApplicationUserDTO findByUsername(String username) {
-        return dsl
+    public SakilaUser findByUsername(String username) {
+        SakilaUser sakilaUser = dsl
                 .select(APPLICATION_USER.ID, APPLICATION_USER.USERNAME, APPLICATION_USER.NAME, APPLICATION_USER.HASHED_PASSWORD, APPLICATION_USER.PROFILE_PICTURE)
                 .from(APPLICATION_USER)
                 .where(APPLICATION_USER.USERNAME.eq(username))
-                .fetchOneInto(ApplicationUserDTO.class);
+                .fetchOneInto(SakilaUser.class);
+        if (sakilaUser != null) {
+            getRoles(sakilaUser.getId())
+                    .forEach(role -> sakilaUser.getRoles().add(Role.valueOf(role.getRoles())));
+        }
+        return sakilaUser;
     }
 
     public Result<UserRolesRecord> getRoles(UUID id) {

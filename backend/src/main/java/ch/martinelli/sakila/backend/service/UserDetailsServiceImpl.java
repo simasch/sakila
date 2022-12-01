@@ -1,6 +1,6 @@
 package ch.martinelli.sakila.backend.service;
 
-import ch.martinelli.sakila.backend.entity.ApplicationUserDTO;
+import ch.martinelli.sakila.backend.entity.SakilaUser;
 import ch.martinelli.sakila.backend.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,16 +24,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        ApplicationUserDTO applicationUser = userRepository.findByUsername(username);
+        SakilaUser applicationUser = userRepository.findByUsername(username);
         if (applicationUser == null) {
             throw new UsernameNotFoundException("No user present with username: " + username);
         } else {
-            return new User(applicationUser.username(), applicationUser.hashedPassword(), getAuthorities(applicationUser));
+            return new User(applicationUser.getUsername(), applicationUser.getHashedPassword(), getAuthorities(applicationUser));
         }
     }
 
-    private List<GrantedAuthority> getAuthorities(ApplicationUserDTO applicationUser) {
-        return userRepository.getRoles(applicationUser.id()).stream()
+    private List<GrantedAuthority> getAuthorities(SakilaUser applicationUser) {
+        return userRepository.getRoles(applicationUser.getId())
+                .stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoles()))
                 .collect(Collectors.toList());
     }

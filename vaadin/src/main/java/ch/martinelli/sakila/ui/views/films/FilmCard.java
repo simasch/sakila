@@ -1,6 +1,6 @@
 package ch.martinelli.sakila.ui.views.films;
 
-import ch.martinelli.sakila.db.tables.records.FilmListRecord;
+import ch.martinelli.sakila.backend.entity.FilmListEntry;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
@@ -9,7 +9,7 @@ import com.vaadin.flow.component.html.Span;
 
 public class FilmCard extends ListItem {
 
-    public FilmCard(FilmListRecord film, String url) {
+    public FilmCard(FilmListEntry film, String url) {
         addClassNames("bg-contrast-5", "flex", "flex-col", "items-start", "p-m", "rounded-l");
 
         Div div = new Div();
@@ -20,24 +20,24 @@ public class FilmCard extends ListItem {
         Image image = new Image();
         image.setWidth("100%");
         image.setSrc(url);
-        image.setAlt(film.getTitle());
+        image.setAlt(film.title());
 
         div.add(image);
 
         Span header = new Span();
         header.addClassNames("text-xl", "font-semibold");
-        header.setText(film.getTitle());
+        header.setText(film.title());
 
         Span subtitle = new Span();
         subtitle.addClassNames("text-s", "text-secondary");
-        subtitle.setText(film.getActors());
+        subtitle.setText(film.actors());
 
-        Paragraph description = new Paragraph(film.getDescription());
+        Paragraph description = new Paragraph(film.description());
         description.addClassName("my-m");
 
         Span badge = new Span();
         badge.getElement().setAttribute("theme", "badge");
-        badge.setText(film.getCategory());
+        badge.setText(film.category());
 
         add(div, header, subtitle, description, badge);
     }

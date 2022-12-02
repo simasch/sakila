@@ -9,8 +9,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-@AnonymousAllowed
 @Endpoint
+@AnonymousAllowed
 public class FilmEndpoint {
 
     private final FilmRepository filmRepository;

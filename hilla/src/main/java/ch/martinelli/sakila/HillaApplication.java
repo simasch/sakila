@@ -9,7 +9,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 @SpringBootApplication
 @Theme(value = "sakila")
-@PWA(name = "Hilla Sakila", shortName = "Hilla Sakila", offlineResources = {})
+@PWA(name = "Hilla Sakila", shortName = "Hilla Sakila")
 public class HillaApplication extends SpringBootServletInitializer implements AppShellConfigurator {
 
     public static void main(String[] args) {

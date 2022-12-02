@@ -34,8 +34,8 @@ public class MainLayout extends AppLayout {
 
     private H2 viewTitle;
 
-    private UserContext userContext;
-    private AccessAnnotationChecker accessChecker;
+    private final UserContext userContext;
+    private final AccessAnnotationChecker accessChecker;
 
     public MainLayout(UserContext userContext, AccessAnnotationChecker accessChecker) {
         this.userContext = userContext;
@@ -108,9 +108,7 @@ public class MainLayout extends AppLayout {
             div.getElement().getStyle().set("align-items", "center");
             div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
             userName.add(div);
-            userName.getSubMenu().addItem("Sign out", e -> {
-                userContext.logout();
-            });
+            userName.getSubMenu().addItem("Sign out", e -> userContext.logout());
 
             layout.add(userMenu);
         } else {

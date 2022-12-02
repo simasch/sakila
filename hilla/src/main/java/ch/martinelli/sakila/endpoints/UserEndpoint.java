@@ -4,11 +4,12 @@ import ch.martinelli.sakila.backend.entity.SakilaUser;
 import ch.martinelli.sakila.security.UserContext;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import dev.hilla.Endpoint;
+import jakarta.annotation.security.PermitAll;
 
 import java.util.Optional;
 
 @Endpoint
-@AnonymousAllowed
+@PermitAll
 public class UserEndpoint {
 
     private final UserContext userContext;

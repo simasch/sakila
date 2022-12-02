@@ -30,8 +30,7 @@ public class CustomerEndpoint {
     }
 
     public int count() {
-        int count = customerRepository.count();
-        return count;
+        return customerRepository.count();
     }
 
     public Optional<Customer> findById(@Nonnull Integer id) {

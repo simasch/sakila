@@ -14,7 +14,7 @@
 
     <properties>
         <jooq.version>3.17.4</jooq.version>
-        <testcontainers.version>1.17.5</testcontainers.version>
+        <testcontainers.version>1.17.6</testcontainers.version>
 
         <db.name>sakila</db.name>
         <db.username>sakila</db.username>

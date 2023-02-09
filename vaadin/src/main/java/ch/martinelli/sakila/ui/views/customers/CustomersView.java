@@ -21,14 +21,14 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.Optional;
 
 import static ch.martinelli.sakila.db.tables.CustomerList.CUSTOMER_LIST;
 import static io.seventytwo.vaadinjooq.util.VaadinJooqUtil.orderFields;
 
-@PermitAll
+@RolesAllowed("ADMIN")
 @PageTitle("Customers")
 @Route(value = "customers/:id?/:action?(edit)", layout = MainLayout.class)
 public class CustomersView extends Div implements BeforeEnterObserver {

@@ -76,7 +76,7 @@ public class MainLayout extends AppLayout {
 
         }
         if (accessChecker.hasAccess(CustomersView.class)) {
-            nav.addItem(new AppNavItem("Master-Detail", CustomersView.class, "la la-columns"));
+            nav.addItem(new AppNavItem("Customers", CustomersView.class, "la la-columns"));
         }
 
         return nav;

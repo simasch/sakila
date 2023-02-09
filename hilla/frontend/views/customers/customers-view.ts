@@ -98,8 +98,6 @@ export class CustomersView extends View {
   async connectedCallback() {
     super.connectedCallback();
 
-    Notification.show("Hello");
-
     this.gridSize = (await CustomerEndpoint.count()) ?? 0;
   }
 

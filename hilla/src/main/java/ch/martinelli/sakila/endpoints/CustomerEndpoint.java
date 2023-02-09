@@ -3,9 +3,9 @@ package ch.martinelli.sakila.endpoints;
 import ch.martinelli.sakila.backend.entity.CustomerListEntry;
 import ch.martinelli.sakila.backend.repository.CustomerRepository;
 import ch.martinelli.sakila.db.tables.records.CustomerRecord;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import dev.hilla.Endpoint;
 import dev.hilla.Nonnull;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-@AnonymousAllowed
+@RolesAllowed({"ADMIN", "USER"})
 @Endpoint
 public class CustomerEndpoint {
 

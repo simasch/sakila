@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<header th:fragment="navigation (page)">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" th:href="@{/}">
+            Sakila
+        </a>
+        <div class="collapse navbar-collapse" id="navbarToggler">
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li th:class="${page == 'customers'} ? 'nav-item active' : 'nav-item'">
+                    <a class="nav-link" th:href="@{/customers}">Customers</a>
+                </li>
+            </ul>
+        </div>
+        <ul class="navbar-nav mr-auto">
+            <li sec:authorize="!isAuthenticated()" class="nav-item">
+                <a class="btn btn-outline-light" th:href="@{/login}">Login</a>
+            </li>
+            <li sec:authorize="isAuthenticated()" class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false" sec:authentication="name">
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="pl-3" th:href="@{/logout}">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+</header>
+</body>
+</html>

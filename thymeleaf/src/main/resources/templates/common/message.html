@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div id="message" th:fragment="message (message)" th:hidden="${message == null}">
+    <!--/*@thymesVar id="message" type="ch.bls.nfdb.controller.Message"*/-->
+    <div th:if="${message.text != null && !message.text.equals('')}"
+         th:class="${'alert alert-' + message.level + ' alert-dismissible fade show'}"
+         role="alert">
+        <span th:text="${message.text}"></span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <script>
+        function hide() {
+            $(".alert").alert('close');
+        }
+
+        setTimeout(hide, 5000);
+    </script>
+</div>
+
+</body>
+</html>

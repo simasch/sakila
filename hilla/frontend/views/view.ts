@@ -3,37 +3,37 @@ import {applyTheme} from 'Frontend/generated/theme';
 import {autorun, IAutorunOptions, IReactionDisposer, IReactionOptions, IReactionPublic, reaction} from 'mobx';
 
 export class MobxElement extends MobxLitElement {
-  private disposers: IReactionDisposer[] = [];
+    private disposers: IReactionDisposer[] = [];
 
-  /**
-   * Creates a MobX reaction using the given parameters and disposes it when this element is detached.
-   *
-   * This should be called from `connectedCallback` to ensure that the reaction is active also if the element is attached again later.
-   */
-  protected reaction<T, FireImmediately extends boolean = false>(
-    expression: (r: IReactionPublic) => T,
-    effect: (arg: T, prev: FireImmediately extends true ? T | undefined : T, r: IReactionPublic) => void,
-    opts?: IReactionOptions<T, FireImmediately>
-  ): void {
-    this.disposers.push(reaction(expression, effect, opts));
-  }
+    /**
+     * Creates a MobX reaction using the given parameters and disposes it when this element is detached.
+     *
+     * This should be called from `connectedCallback` to ensure that the reaction is active also if the element is attached again later.
+     */
+    protected reaction<T, FireImmediately extends boolean = false>(
+        expression: (r: IReactionPublic) => T,
+        effect: (arg: T, prev: FireImmediately extends true ? T | undefined : T, r: IReactionPublic) => void,
+        opts?: IReactionOptions<T, FireImmediately>
+    ): void {
+        this.disposers.push(reaction(expression, effect, opts));
+    }
 
-  /**
-   * Creates a MobX autorun using the given parameters and disposes it when this element is detached.
-   *
-   * This should be called from `connectedCallback` to ensure that the reaction is active also if the element is attached again later.
-   */
-  protected autorun(view: (r: IReactionPublic) => any, opts?: IAutorunOptions): void {
-    this.disposers.push(autorun(view, opts));
-  }
+    /**
+     * Creates a MobX autorun using the given parameters and disposes it when this element is detached.
+     *
+     * This should be called from `connectedCallback` to ensure that the reaction is active also if the element is attached again later.
+     */
+    protected autorun(view: (r: IReactionPublic) => any, opts?: IAutorunOptions): void {
+        this.disposers.push(autorun(view, opts));
+    }
 
-  disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this.disposers.forEach((disposer) => {
-      disposer();
-    });
-    this.disposers = [];
-  }
+    disconnectedCallback(): void {
+        super.disconnectedCallback();
+        this.disposers.forEach((disposer) => {
+            disposer();
+        });
+        this.disposers = [];
+    }
 }
 
 /**
@@ -48,10 +48,10 @@ export class MobxElement extends MobxLitElement {
  * The view class also brings the MobX dependency for state management.
  */
 export class View extends MobxElement {
-  createRenderRoot(): Element | ShadowRoot {
-    // Do not use a shadow root
-    return this;
-  }
+    createRenderRoot(): Element | ShadowRoot {
+        // Do not use a shadow root
+        return this;
+    }
 }
 
 /**
@@ -64,8 +64,8 @@ export class View extends MobxElement {
  * The layout class also bring the MobX dependency for state management.
  */
 export class Layout extends MobxElement {
-  connectedCallback(): void {
-    super.connectedCallback();
-    applyTheme(this.shadowRoot as ShadowRoot);
-  }
+    connectedCallback(): void {
+        super.connectedCallback();
+        applyTheme(this.shadowRoot as ShadowRoot);
+    }
 }

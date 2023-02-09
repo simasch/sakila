@@ -1,6 +1,7 @@
 import {Route} from '@vaadin/router';
 import {appStore} from './stores/app-store';
 import './views/main-layout';
+import './views/films/films-view';
 import Role from 'Frontend/generated/ch/martinelli/sakila/backend/entity/Role';
 
 export type ViewRoute = Route & {

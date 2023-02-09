@@ -18,6 +18,7 @@
     <modules>
         <module>backend</module>
         <module>hilla</module>
+        <module>thymeleaf</module>
         <module>vaadin</module>
     </modules>
 
